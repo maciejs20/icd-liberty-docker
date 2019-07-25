@@ -1,0 +1,46 @@
+<!-- **************************************************** Begin Standard Header - Do not add comments here ***
+* Licensed Materials - Property of IBM
+*
+* 5724-U18
+*
+* (C) Copyright IBM Corp. 2014  All Rights Reserved.
+*
+* US Government Users Restricted Rights - Use, duplication, or
+* disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+********************************************************* End Standard Header -->
+<agent-input>
+  <server>
+<!-- Provide the repository location for the Control Desk V7.6 offering package -->
+<!-- Use a URL or Universal Naming Convention path to specify the location of remote repositories. -->
+<!-- To specify a local repository, provide a directory path -->
+<!-- Uncompress product image files in the root directory \Launchpad. If you choose a different -->
+<!--  directory, update the path specified for the repository location.  -->
+    <repository location='Launchpad/Install/ServiceProviderRepo/ServiceProviderInstallerRepository.zip'/>
+    <repository location='Launchpad/Install/ControlDeskRepo'/>
+    <repository location='Launchpad/Install/TPAEInstallerRepository'/>
+    <repository location=' Launchpad/Install/MWInstallerRepository'/>
+    <!-- Uncomment this section if you want to install Optional Content
+    <repository location='/Launchpad/Install/ControlDeskOptionalContentRepo'/> -->
+  </server>
+<!-- A profile is an installation location. The 'installLocation' keyword determines the base installation path. -->
+<!-- Specify a Control Desk V7.6 installation location. Do not reuse the installation location of a currently installed Maximo product. -->
+  <profile id='IBM   Tivoli&apos;s process automation suite' installLocation='/opt/IBM/SMP'>
+  </profile>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Do not change anything below this line unless the profile provided above has      -->
+<!-- been changed.  If it has, provide the same profile information for the following  -->
+<!-- offering lines.                                                                                                                               -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+  <install modify='false'>
+    <!-- IBM Control Desk for Service Providers 7.6.1 -->
+    <offering profile='IBM   Tivoli&apos;s process automation suite' id='com.ibm.tivoli.tpae.base.tpae.main' features='TPAEWin32bitSupport.feature,main.feature,java.feature,configTool.feature' installFixes='none'/>
+	<!-- IBM Maximo for Service Providers 7.6.3 -->
+    <offering profile='IBM   Tivoli&apos;s process automation suite' id='com.ibm.tivoli.tpae.IS.ServiceProvider' version='7.6.3020.20180731_0603' features='main.feature'/>
+<!-- IBM CControl Desk 7.6.1 -->
+    <offering profile='IBM   Tivoli&apos;s process automation suite' id='com.ibm.tivoli.tpae.base.icd.adv.main' features='main.feature'/>
+   <!-- Uncomment this section if you want to install Optional Content
+	     IBM Control Desk Optional Content 7.6.1
+    <offering profile='IBM   Tivoli&apos;s process automation suite' id='com.ibm.tivoli.tpae.base.icd.options.main' features='main.feature'/> -->
+  </install>
+</agent-input>

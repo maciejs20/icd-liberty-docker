@@ -14,8 +14,9 @@ FROM ubuntu:16.04
 
 LABEL maintainer="nishi2go@gmail.com"
 
-ARG imagesurl=http://liberty-images
+ARG imagesurl=ftp://192.168.7.82
 ARG updateim=no
+
 
 ENV TEMP /tmp
 WORKDIR /tmp
@@ -23,13 +24,14 @@ WORKDIR /tmp
 # Install required packages
 RUN apt-get update && apt-get install -y wget unzip && rm -rf /var/lib/apt/lists/*
 
-# Install IBM Installation Manager 1.8.8
-ENV IM_IMAGE IED_V1.8.8_Wins_Linux_86.zip
 
-RUN mkdir /Install_Mgr && wget -q ${imagesurl}/$IM_IMAGE \
+# Install IBM Installation Manager
+ENV IM_IMAGE agent.installer.linux.gtk.x86_64_1.8.9004.20190423_2015.zip
+
+RUN mkdir /Install_Mgr && wget ${imagesurl}/$IM_IMAGE \
  && unzip -q -d /Install_Mgr $IM_IMAGE \
  && rm $IM_IMAGE \
- && /Install_Mgr/EnterpriseDVD/Linux_x86_64/EnterpriseCD-Linux-x86_64/InstallationManager/installc -log /tmp/IM_Install_Unix.xml -acceptLicense \
+ && /Install_Mgr/installc -log /tmp/IM_Install_Unix.xml -acceptLicense \
  && rm -rf /Install_Mgr
 
 ## Update Installation Manager
