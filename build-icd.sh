@@ -172,21 +172,35 @@ if [[ $REMOVE -eq 1 ]]; then
 fi
 
 echo "Start to build..."
+nrmax="16"
+nr=1
 
-# Create a newwork for build if it does not exist
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Create a network for build if it does not exist"
 if [[ -z `$DOCKER network ls -q --no-trunc -f "name=^${BUILD_NETWORK_NAME}$"` ]]; then
   echo "Docker network build does not exist. Start to make it."
   $DOCKER network create ${BUILD_NETWORK_NAME}
   $DOCKER network ls -f "name=^${BUILD_NETWORK_NAME}$"
 fi
 
-# Remove and run a container for HTTP server
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Remove and run a container for HTTP server"
 images_exists=`$DOCKER ps -aq --no-trunc -f "name=^/${IMAGE_SERVER_NAME}$"`
 if [[ ! -z "$images_exists" ]]; then
     echo "Docker container ${IMAGE_SERVER_NAME} has been started. Remove it."
     $DOCKER rm -f "$images_exists"
 fi
 
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
 echo "Start a container - ${IMAGE_SERVER_NAME}"
 $DOCKER run --rm --name ${IMAGE_SERVER_NAME} -h ${IMAGE_SERVER_HOST_NAME} \
  --network ${BUILD_NETWORK_NAME} -v "${IMAGE_DIR}":/usr/share/nginx/html:ro -d nginx
@@ -195,44 +209,93 @@ $DOCKER ps -f "name=^/${IMAGE_SERVER_NAME}"
 sleep 1
 
 echo "------------------------------------------------------------"
-echo "Build IBM Installation Manager image"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM Installation Manager image - ibmim"
 build "ibmim" "$IM_VER" "ibmim" "IBM Installation Manager"
 
 echo "------------------------------------------------------------"
-echo "Build IBM Control Desk image"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM Control Desk image - icd"
 build "icd" "$MAXIMO_VER" "icd" "IBM Control Desk" "--build-arg enablejms=$JMS_OPT"
 
 echo "------------------------------------------------------------"
-echo "Build IBM Db2 Advanced Workgroup Edition image"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM Db2 Advanced Workgroup Edition image - db2"
 build "db2" "$DB2_VER" "maxdb" "IBM Db2 Advanced Workgroup Server Edition"
 
-# Build IBM WebSphere Liberty base image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty base image - liberty"
 build "liberty" "$WAS_VER" "liberty" "IBM WebSphere Application Server Liberty base" "--build-arg libertyver=$WAS_VER"
 
-# Build IBM WebSphere Liberty JMS server image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty JMS server image - jmsserver"
 build "jmsserver" "$WAS_VER" "jmsserver" "IBM WebSphere Application Server Liberty JMS server"
 
-# Build IBM WebSphere Liberty for Maximo UI image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty for Maximo UI image - maximo-ui"
 build "maximo-ui" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo UI" "--build-arg maximoapp=maximo-ui"
 
-# Build IBM WebSphere Liberty for Maximo Crontask image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty for Maximo Crontask image - maxapp"
 build "maximo-cron" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo Crontask" "--build-arg maximoapp=maximo-cron"
 
-# Build IBM WebSphere Liberty for Maximo API image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty for Maximo API image - maxapp"
 build "maximo-api" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo API" "--build-arg maximoapp=maximo-api"
 
-# Build IBM WebSphere Liberty for Maximo Report Server image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty for Maximo Report Server image - maximo-report"
 build "maximo-report" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo Report" "--build-arg maximoapp=maximo-report"
 
-# Build IBM WebSphere Liberty for Maximo MEA image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty for Maximo MEA image - maximo-mea"
 build "maximo-mea" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo MEA" "--build-arg maximoapp=maximo-mea"
 
-# Build IBM WebSphere Liberty for Maximo Report Server image
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build IBM WebSphere Liberty for Maximo Report Server image - maximo-jmsconsumer"
 build "maximo-jmsconsumer" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo JMS Consumer" "--build-arg maximoapp=maximo-jmsconsumer"
 
-# Build Frontend Proxy Server
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
+echo "Build Frontend Proxy Server - frontend-proxy"
 build "frontend-proxy" "$PROXY_VER" "frontend-proxy" "Frontend Proxy Server"
 
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
 echo "Stop the images container - ${IMAGE_SERVER_NAME}"
 $DOCKER stop ${IMAGE_SERVER_NAME}
 

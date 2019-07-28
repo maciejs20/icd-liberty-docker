@@ -13,21 +13,22 @@ FROM ubuntu:16.04
 
 LABEL maintainer="nishi2go@gmail.com"
 
-ARG imagesurl=http://liberty-images
+ARG imagesurl=ftp://192.168.7.82
 
-ARG ver=11.1
-ARG fp=4fp4a
+
 ARG backupdir=/backup
 ARG dbalias=MAXDB76
 
 ## Install required software
 RUN dpkg --add-architecture i386
 RUN apt-get update -y && apt-get install -y sudo wget unzip bsdtar netcat file \
-    libx32stdc++6 libpam0g:i386 binutils libaio1 libnuma1 \
+    libx32stdc++6 libpam0g:i386 binutils libaio1 libnuma1 netbase \
     && rm -rf /var/lib/apt/lists/*
 
+RUN echo "db2c_db2inst1         50000/tcp" >> /etc/services
+
 # Install IBM DB2
-ENV DB2_IMAGE DB2_AWSE_REST_Svr_${ver}_Lnx_86-64.tar.gz
+ENV DB2_IMAGE Middl_Inst_DB2_111_Linux_x86-64.tar.gz
 
 #ENV DB_MAXIMO_PASSWORD changeit
 
@@ -41,7 +42,8 @@ ENV MAXDB ${dbalias}
 ENV DB_PORT 50005
 ENV BACKUPDIR ${backupdir}
 
-RUN echo "ctginst1    ALL=(root) NOPASSWD: /usr/sbin/chpasswd, $DB2_PATH/instance/db2rfe " >> /etc/sudoers.d/ctginst1
+#RUN echo "ctginst1    ALL=(root) NOPASSWD: /usr/sbin/chpasswd, $DB2_PATH/instance/db2rfe " >> /etc/sudoers.d/ctginst1
+RUN echo "ctginst1    AALL=(ALL) NOPASSWD:ALL " >> /etc/sudoers.d/ctginst1
 
 RUN mkdir ${backupdir}
 RUN chown ctginst1.ctggrp1 ${backupdir}
@@ -49,29 +51,52 @@ RUN chmod 700 ${backupdir}
 
 RUN mkdir /work
 RUN chown ctginst1.ctggrp1 /work
-COPY --chown=ctginst1:ctggrp1 *.sh /work/
-RUN chmod -R 700 /work/
+
 
 # Install DB2 V11.1 and Fixpack
 WORKDIR /tmp
 USER ctginst1
 COPY --chown=ctginst1:ctggrp1 db2awse.rsp /tmp
-ENV DB2_FP_IMAGE v${ver}.${fp}_linuxx64_server_t.tar.gz
-RUN wget -q ${imagesurl}/$DB2_IMAGE \
+#ENV DB2_FP_IMAGE v${ver}.${fp}_linuxx64_server_t.tar.gz
+RUN mkdir Install \
+  && cd Install \
+  && echo "*** Download DB2 image" \
+  && wget -q ${imagesurl}/$DB2_IMAGE \
+  && ls -la \
+  && echo "*** Extract DB2 image" \
   && bsdtar -zxpf $DB2_IMAGE \
-  && ./server_awse_o/db2setup -r db2awse.rsp \
-  && $DB2_PATH/adm/db2licm -a ./server_awse_o/db2/license/db2awse_o.lic \
+  && ls -la && ls -la Install && ls -la Install/mwi_madt_DB2AWSv11.1.0.0_images/files \
+  && bsdtar -zxpf  Install/mwi_madt_DB2AWSv11.1.0.0_images/files/DB2_AWSE_REST_Svr_11.1_Lnx_86-64_11.1.0.0.tar.gz \
+  && ls -la && ls -la Install && ls -la Install/mwi_madt_DB2AWSv11.1.0.0_images/files
+RUN echo "*** Install DB2" \
+  && ls -la && ls -la /tmp && ls -la /tmp/Install \
+  && pwd && cat /tmp/db2awse.rsp \
+  && ./Install/server_awse_o/db2setup -r /tmp/db2awse.rsp \
+  && echo "*** Install license" \
+  && $DB2_PATH/adm/db2licm -a ./Install/server_awse_o/db2/license/db2awse_o.lic \
   && $DB2_PATH/adm/db2licm -l \
-  && rm -rf * \
-  && . ~/sqllib/db2profile && db2stop \
-  && wget -q ${imagesurl}/$DB2_FP_IMAGE \
-  && bsdtar -zxpf $DB2_FP_IMAGE \
-  && cd server_t \
-  && ./installFixPack -n -f update -f nobackup -f db2lib  \
+  && cd .. && rm -rf Install
+RUN  echo "*** Clean up" \
+  && . ~/sqllib/db2profile \
+  # && db2stop \
+  #&& wget -q ${imagesurl}/$DB2_FP_IMAGE \
+  #&& bsdtar -zxpf $DB2_FP_IMAGE \
+  #&& cd server_t \
+  #&& ./installFixPack -n -f update -f nobackup -f db2lib  \
   && cd .. \
-  && rm -rf * \
+  && pwd && ls -la && ls -la /tmp \
+  && rm -rf /tmp/*
+
+  COPY --chown=ctginst1:ctggrp1 *.sh /work/
+  RUN chmod -R 700 /work/
+  USER root
+  RUN echo "0 localhost 0" > /home/ctginst1/sqllib/db2nodes.cfg
+  USER ctginst1
+
+  RUN echo "*** Exec" \
   && /work/installdb2.sh
 
 WORKDIR /work
 
-ENTRYPOINT ["/work/startdb2.sh"]
+#ENTRYPOINT ["/work/startdb2.sh"]
+ENTRYPOINT ["/bin/sh"]

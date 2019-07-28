@@ -14,6 +14,8 @@
 
 #chown ctginst1.ctggrp1 $MAXDB_DATADIR
 
+
+#set -x
 #copy skel files
 if [ ! -f "/home/ctginst1/.bashrc" ]
 then
@@ -23,12 +25,15 @@ fi
 if [ -d "/home/ctginst1/sqllib" ]
 then
     source ~/sqllib/db2profile
+    echo "db2nodes: "
+    cat /home/ctginst1/sqllib/db2nodes.cfg
 #    ${DB2_PATH}/instance/db2icrt -s ese -u ctgfenc1 -p 50000 ctginst1
+    ls -la /home/ctginst1/sqllib/db2nodes.cfg
     db2start
     db2 update dbm config using SVCENAME 50000 DEFERRED
-    db2stop
-    db2set -null DB2COMM
-    db2start
+    #db2stop
+    #db2set -null DB2COMM
+    #db2start
     db2 create db $MAXDB ALIAS $MAXDB using codeset UTF-8 territory US pagesize 32 K
     db2 update db cfg for $MAXDB using SELF_TUNING_MEM ON
     db2 update db cfg for $MAXDB using APPGROUP_MEM_SZ 16384 DEFERRED

@@ -9,12 +9,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM maximo-liberty/liberty
+FROM icd-liberty/liberty
 
 LABEL maintainer="nishi2go@gmail.com"
 
 ARG maximoapp=maximo-ui
-COPY --chown=1001:0 --from=maximo-liberty/maximo /opt/IBM/SMP/maximo/deployment/was-liberty-default/deployment/$maximoapp/$maximoapp-server/ /config/
+COPY --chown=1001:0 --from=icd-liberty/icd /opt/IBM/SMP/maximo/deployment/was-liberty-default/deployment/$maximoapp/$maximoapp-server/ /config/
 
 RUN installUtility install --acceptLicense defaultServer
 

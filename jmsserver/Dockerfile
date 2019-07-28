@@ -9,7 +9,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM maximo-liberty/liberty
+FROM icd-liberty/liberty
 
 LABEL maintainer="nishi2go@gmail.com"
 

@@ -15,7 +15,7 @@ FROM websphere-liberty:${libertyver}
 
 LABEL maintainer="nishi2go@gmail.com"
 
-ARG imagesurl=http://liberty-images
+ARG imagesurl=ftp://192.168.7.82
 
 # Install required packages
 USER root
@@ -27,8 +27,8 @@ RUN wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-
 USER 1001
 
 WORKDIR /tmp
-RUN wget -q ${imagesurl}/wlp-nd-license.jar \
- && java -jar /tmp/wlp-nd-license.jar --acceptLicense /opt/ibm \
- && rm /tmp/wlp-nd-license.jar
+RUN wget ${imagesurl}/wlp-base-license.jar
+RUN java -jar /tmp/wlp-base-license.jar --acceptLicense /opt/ibm
+RUN rm /tmp/wlp-base-license.jar
 
 ENV KEYSTORE_REQUIRED false
