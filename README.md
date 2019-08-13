@@ -1,10 +1,11 @@
-# Building and deploying an IBM Maximo Asset Management V7.6.1 with Liberty image to Docker
+# Building and deploying an IBM Control Desk V7.6.1 with Liberty image to Docker
 
 **This is an experimental version. Please report issues if you have some difficulties.**
+** At this stage it does not work! ***
 
-This is ICD installation on docker, work in progress
+This project is based on nishi2go/maximo-liberty-docker - altered for IBM Control Desk to work. It does not support building of pure Maximo, only ICD installation will be supported.
 
-Maximo with Liberty on Docker enables to run Maximo Asset Management with WebSphere Liberty on Docker. The images are deployed fine-grained services instead of single instance. The following instructions describe how to set up IBM Maximo Asset Management V7.6 Docker images. This images consist of several components e.g. WebSphere Liberty, Db2, and Maximo installation program.
+ICD with Liberty on Docker enables to run Control Desk with WebSphere Liberty on Docker. The images are deployed fine-grained services instead of single instance. The following instructions describe how to set up IBM Control Desk V7.6 Docker images. This images consist of several components e.g. WebSphere Liberty, Db2, and ICD installation program.
 
 Before you start, please check the official guide in technotes first. [Maximo Asset Management 7.6.1 WebSphere Liberty Support](https://www-01.ibm.com/support/docview.wss?uid=swg22017219)
 
@@ -82,7 +83,12 @@ Procedures:
    Note 1: This script works on Windows Subsystem on Linux.<br>
    Note 2: md5sum is required. For Mac, install it manually - https://raamdev.com/2008/howto-install-md5sum-sha1sum-on-mac-os-x/
 7. Edit docker-compose.yml to enable optional servers e.g. maximo-api, maximo-report and etc.
-6. Run containers by using the Docker Compose file to create and deploy instances:
+
+8. Test Your build with
+    ```bash
+    docker-compose up --abort-on-container-exit
+
+9. Run containers by using the Docker Compose file to create and deploy instances:
     ```bash
     docker-compose up -d
     ```
@@ -92,7 +98,7 @@ Procedures:
     ```bash
     docker-compose up -d --scale maximo-ui=2
     ```
-7. Make sure to be accessible to Maximo login page: http://hostname/maximo
+10. Make sure to be accessible to Maximo login page: http://hostname/maximo
 
 ## Skip the maxinst process in starting up the maxdb container by using Db2 restore command
 
