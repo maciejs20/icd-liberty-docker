@@ -87,11 +87,10 @@ trap sigterm_handler SIGTERM
 
 # Wait until DB2 port is opened
 until netcat -z localhost $DB_PORT >/dev/null 2>&1; do
-  echo "*** Wait for DB2 to come up - 1st"
+  echo "*** Wait for DB2 to come up"
   sleep 10
 done
 
 while netcat -z localhost $DB_PORT >/dev/null 2>&1; do
-  echo "*** Wait for DB2 to come up - 2nd"
   sleep 10
 done

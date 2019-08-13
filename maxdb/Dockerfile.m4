@@ -36,22 +36,23 @@ RUN apt-get update -y && apt-get install -y sudo wget unzip bsdtar netcat file l
 # Install IBM DB2
 
 
-#ENV DB_MAXIMO_PASSWORD changeit
+ENV DB_MAXIMO_PASSWORD changeit
+ENV DB2_PATH /home/ctginst1/sqllib
+ENV MAXDB ${dbalias}
+ENV DB_PORT 50005
+ENV BACKUPDIR ${backupdir}
 
 RUN groupadd ctggrp1
 RUN groupadd maximo
 RUN useradd -g ctggrp1 -m -d /home/ctginst1 ctginst1
 RUN useradd -g maximo -m -d /home/maximo maximo
 
-ENV DB2_PATH /home/ctginst1/sqllib
-ENV MAXDB ${dbalias}
-ENV DB_PORT 50005
-ENV BACKUPDIR ${backupdir}
+RUN echo "maximo:${DB_MAXIMO_PASSWORD}" | chpasswd
 
 RUN echo "db2c_db2inst1         $DB_PORT/tcp" >> /etc/services
 
 #RUN echo "ctginst1    ALL=(root) NOPASSWD: /usr/sbin/chpasswd, $DB2_PATH/instance/db2rfe " >> /etc/sudoers.d/ctginst1
-RUN echo "ctginst1    AALL=(ALL) NOPASSWD:ALL " >> /etc/sudoers.d/ctginst1
+RUN echo "ctginst1    ALL=(ALL) NOPASSWD:ALL " >> /etc/sudoers.d/ctginst1
 
 RUN mkdir ${backupdir}
 RUN chown ctginst1.ctggrp1 ${backupdir}
@@ -99,6 +100,11 @@ RUN mkdir Install \
   RUN chmod -R 700 /work/
   USER root
   RUN echo "0 localhost 0" > /home/ctginst1/sqllib/db2nodes.cfg
+  RUN chown root:root /home/ctginst1/sqllib/security/db2chpw \
+      && chown root:root /home/ctginst1/sqllib/security/db2ckpw \
+      && chmod 4511 /home/ctginst1/sqllib/security/db2chpw \
+      && chmod 4511 /home/ctginst1/sqllib/security/db2ckpw
+
   USER ctginst1
 
   RUN echo "*** Exec" \
