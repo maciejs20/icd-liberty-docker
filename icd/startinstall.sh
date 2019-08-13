@@ -21,7 +21,7 @@ then
 fi
 
 # Watch and wait the database
-wait-for-it.sh $DB_HOST_NAME:$DB_PORT -t 0 -q -- echo "Database is up"
+wait-for-it.sh $DB_HOST_NAME:$DB_PORT -t 0 -q -- echo "*** Database is up"
 
 if [[ ! -z "$ENABLE_DEMO_DATA" && "$ENABLE_DEMO_DATA" = "yes" ]]
 then
@@ -32,7 +32,7 @@ fi
 CONFIG_FILE=/opt/maximo-config.properties
 if [ -f $CONFIG_FILE ]
 then
-  echo "Maximo has already configured."
+  echo "*** Maximo has already configured."
 else
   cat > $CONFIG_FILE <<EOF
 MW.Operation=Configure
@@ -72,7 +72,10 @@ IHS.AutomateConfig=false
 WAS.ClusterAutomatedConfig=false
 WAS.DeploymentManagerRemoteConfig=false
 EOF
-
+echo "*** Config file"
+echo "------------------"
+cat $CONFIG_FILE
+echo "------------------"
   # Run Configuration Tool
   $SMP/ConfigTool/scripts/reconfigurePae.sh -action deployConfiguration \
     -bypassJ2eeValidation -inputfile $CONFIG_FILE $DEMO_DATA

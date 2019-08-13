@@ -25,12 +25,15 @@ fi
 if [ -d "/home/ctginst1/sqllib" ]
 then
     source ~/sqllib/db2profile
+    echo "SET----------------"
+    set
+    echo "-------------------"
     echo "db2nodes: "
     cat /home/ctginst1/sqllib/db2nodes.cfg
 #    ${DB2_PATH}/instance/db2icrt -s ese -u ctgfenc1 -p 50000 ctginst1
     ls -la /home/ctginst1/sqllib/db2nodes.cfg
     db2start
-    db2 update dbm config using SVCENAME 50000 DEFERRED
+    db2 update dbm config using SVCENAME 50005 DEFERRED
     #db2stop
     #db2set -null DB2COMM
     #db2start

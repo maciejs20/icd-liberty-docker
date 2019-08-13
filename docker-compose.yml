@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   maxdb:
-    image: maximo-liberty/db2
+    image: icd-liberty/db2
     hostname: "${ENV_DB_HOST_NAME}"
     environment:
       - "DB_MAXIMO_PASSWORD=${ENV_DB_MAXIMO_PASSWORD}"
@@ -28,9 +28,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-  
-  maximo:
-    image: maximo-liberty/maximo
+
+  icd:
+    image: icd-liberty/icd
     environment:
       - MXINTADM_PASSWORD=changeit
       - MAXADMIN_PASSWORD=changeit
@@ -54,7 +54,7 @@ services:
       - maximo:/maximo
 
   maximo-ui:
-    image: maximo-liberty/maximo-ui
+    image: icd-liberty/maximo-ui
     environment:
       - "ADMIN_USER_NAME=${ENV_ADMIN_USER_NAME}"
       - "ADMIN_PASSWORD=${ENV_ADMIN_PASSWORD}"
@@ -64,7 +64,7 @@ services:
       - WLP_LOGGING_CONSOLE_LOGLEVEL=info
     depends_on:
       - maxdb
-      - maximo
+      - icd
       - jmsserver
     networks:
       frontend:
@@ -75,7 +75,7 @@ services:
       - maximo:/maximo
 
   maximo-cron:
-    image: maximo-liberty/maximo-cron
+    image: icd-liberty/maximo-cron
     environment:
       - "ADMIN_USER_NAME=${ENV_ADMIN_USER_NAME}"
       - "ADMIN_PASSWORD=${ENV_ADMIN_PASSWORD}"
@@ -84,7 +84,7 @@ services:
       - "JMS_SERVER_PORT=${ENV_JMS_SERVER_PORT}"
     depends_on:
       - maxdb
-      - maximo
+      - icd
       - jmsserver
     networks:
       frontend:
@@ -133,7 +133,7 @@ services:
   #     - maximo:/maximo
 
   maximo-mea:
-    image: maximo-liberty/maximo-mea
+    image: icd-liberty/maximo-mea
     environment:
       - "ADMIN_USER_NAME=${ENV_ADMIN_USER_NAME}"
       - "ADMIN_PASSWORD=${ENV_ADMIN_PASSWORD}"
@@ -142,7 +142,7 @@ services:
       - "JMS_SERVER_PORT=${ENV_JMS_SERVER_PORT}"
     depends_on:
       - maxdb
-      - maximo
+      - icd
       - jmsserver
     networks:
      frontend:
@@ -173,7 +173,7 @@ services:
   #     - maximo:/maximo
 
   jmsserver:
-    image: maximo-liberty/jmsserver
+    image: icd-liberty/jmsserver
     environment:
       - LICENSE=accept
       - "JMS_SERVER_HOST=${ENV_JMS_SERVER_HOST}"
@@ -187,7 +187,7 @@ services:
       - frontend
 
   frontend-proxy:
-    image: maximo-liberty/frontend-proxy
+    image: icd-liberty/frontend-proxy
     ports:
       - 80:80
     depends_on:

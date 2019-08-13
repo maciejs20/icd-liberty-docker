@@ -50,6 +50,7 @@ function remove {
 # Usage: build "tag name" "version" "target directory name" "product name"
 function build {
   echo "Start to build $4 image, opts: $*"
+  cd $3; make; cd ..
   $DOCKER build $QUIET $5 --rm $EXTRA_BUILD_ARGS -t $NAME_SPACE/$1:$2 -t $NAME_SPACE/$1:latest --network $BUILD_NETWORK_NAME $3
 
   exists=`$DOCKER images -q --no-trunc $NAME_SPACE/$1:$2`
