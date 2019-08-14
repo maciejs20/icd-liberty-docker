@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_DIR=
+IMAGE_DIR=images
 CHECK_DIR=
 JMS_OPT="no"
 PACKAGE_LIST=packages.list
