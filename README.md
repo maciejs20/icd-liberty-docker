@@ -1,7 +1,7 @@
 # Building and deploying an IBM Control Desk V7.6.1 with Liberty image to Docker
 
 **This is an experimental version. Please report issues if you have some difficulties.**
-** At this stage it does not work! ***
+** At this stage does start, but some pages are rendered incorrectly ***
 
 This project is based on nishi2go/maximo-liberty-docker - altered for IBM Control Desk to work. It does not support building of pure Maximo, only ICD installation will be supported.
 
