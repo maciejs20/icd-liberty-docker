@@ -1,12 +1,17 @@
 # Building and deploying an IBM Control Desk V7.6.1 with Liberty image to Docker
 
-**This is an experimental version. Please report issues if you have some difficulties.**
+**This is an experimental version. It does not work properly.**
 
-** At this stage does start, but some pages are rendered incorrectly ***
+### Current state
 
-This project is based on nishi2go/maximo-liberty-docker - altered for IBM Control Desk to work. It does not support building of pure Maximo, only ICD installation will be supported.
+At this stage does start, but some pages are rendered incorrectly ***
 
-ICD with Liberty on Docker enables to run Control Desk with WebSphere Liberty on Docker. The images are deployed fine-grained services instead of single instance. The following instructions describe how to set up IBM Control Desk V7.6 Docker images. This images consist of several components e.g. WebSphere Liberty, Db2, and ICD installation program.
+
+### Goals
+This project is heavily based on nishi2go/maximo-liberty-docker - altered for IBM Control Desk to work. All credits goes to nishi2go, he did 90% of the work required for ICD to start.
+My fork does not support building of pure Maximo, only ICD installation is to be supported.
+
+ICD with Liberty on Docker enables to run Control Desk with WebSphere Liberty on Docker. The images are deployed fine-grained services instead of single instance. The following instructions describe how to set up IBM Control Desk V7.6.1 Docker images. This images consist of several components e.g. WebSphere Liberty, Db2, and ICD installation program.
 
 Before you start, please check the official guide in technotes first. [Maximo Asset Management 7.6.1 WebSphere Liberty Support](https://www-01.ibm.com/support/docview.wss?uid=swg22017219)
 
@@ -14,62 +19,62 @@ Before you start, please check the official guide in technotes first. [Maximo As
 
 ## Required packages
 
-* IBM Installation Manager binaries from [Installation Manager 1.8 download documents](http://www-01.ibm.com/support/docview.wss?uid=swg24037640)
+1. IBM Installation Manager binaries from [Installation Manager 1.8 download documents](http://www-01.ibm.com/support/docview.wss?uid=swg24037640)
+  * agent.installer.linux.gtk.x86_64_1.8.9004.20190423_2015.zip
 
-  IBM Enterprise Deployment (formerly known as IBM Installation Manager) binaries:
-  * IED_V1.8.8_Wins_Linux_86.zip
 
-* IBM Maximo Asset Management V7.6.1 binaries from [Passport Advantage](http://www-01.ibm.com/software/passportadvantage/pao_customer.html)
+2. IBM Control Desk V7.6.1 binaries from [Passport Advantage](http://www-01.ibm.com/software/passportadvantage/pao_customer.html)
 
-  IBM Maximo Asset Management V7.6.1 binaries:
-  * MAM_7.6.1_LINUX64.tar.gz
+   *ICD V7.6.1 binaries:*
+   * launchpad_761adv_part1.tar.tar
+   * icd_launchpad_part2_common.tar.tar
 
-  IBM WebSphere Liberty base license V9 binaries:
+   *IBM WebSphere Liberty base license V9 binaries:*
   * wlp-base-license.jar
 
-  IBM Db2 Advanced Workgroup Edition V11.1 binaries:
-  * DB2_AWSE_REST_Svr_11.1_Lnx_86-64.tar.gz
+  *IBM Db2 Advanced Workgroup Edition V11.1 binaries:*
+  * Middl_Inst_DB2_111_Linux_x86-64.tar.gz
 
-* Feature Pack/Fix Pack binaries from [Fix Central](http://www-945.ibm.com/support/fixcentral/)
 
-  IBM Maximo Asset Management V7.6.1 Feature pack 1 binaries:
-  * MAMMTFP7611IMRepo.zip
+3. Fix Pack binaries from [Fix Central](http://www-945.ibm.com/support/fixcentral/)
 
-  IBM Db2 Server V11.1 Fix Pack 4 Mod 1
-  * v11.1.4fp4a_linuxx64_server_t.tar.gz
+  IBM ICD V7.6.1 Fix pack 1 binaries:
+  * icd_7.6.1.1_part1_adv.zip
+  * icd_7.6.1.1_part2_linux64.zip
 
-## Building IBM Maximo Asset Management V7.6.1 with Liberty image by using build tool
 
-Prerequisites: all binaries must be accessible via a web server during building phase.
+## Building IBM ICD V7.6.1 with Liberty image by using build tool
+
 
 You can use a tool for building docker images by using the build tool.
 
 Usage:
 ```
-Usage: build.sh [OPTIONS] [DIR]
+Usage: build-icd.sh [OPTIONS] [DIR]
 
--c | --check            Check required packages
--C | --deepcheck        Check and compare checksum of required packages
--r | --remove           Remove images when an image exists in repository
+-c | --check            Check required packages [not supported at this moment]
+-C | --deepcheck        Check and compare checksum of required packages [not supported at this moment]
+-r | --remove           Remove images when an image exists in repository [not supported at this moment]
 -J | --disable-jms      Disable JMS configurations in application servers
--d | --check-dir [DIR]  The directory for validating packages (Docker for Windows only)
+-d | --check-dir [DIR]  The directory for validating packages (Docker for Windows only) [not supported at this moment]
 -v | --verbose          Output verbosity in docker build
 -h | --help             Show this help text
 ```
 
 Procedures:
-1. Place the downloaded Maximo, IBM Db2, IBM Installation Manager and IBM WebSphere Liberty License binaries on a directory
-2. Clone this repository
+
+1. Clone this repository
     ```bash
-    git clone https://github.com/nishi2go/maximo-liberty-docker.git
+    git clone https://github.com/maciejs20/icd-liberty-docker
     ```
-3. Move to the directory
+2. Move to the directory
     ```bash
     cd maximo-liberty-docker
     ```
+3. Place the downloaded ICD, IBM Db2, IBM Installation Manager and IBM WebSphere Liberty License binaries to a images directory
 4. Run build tool
    ```bash
-   bash build.sh [-c] [-C] [-r] [Image directory]
+   bash build.sh-icd [-c] [-C] [-r] [Image directory]
    ```
 
    Example:
@@ -99,7 +104,7 @@ Procedures:
     ```bash
     docker-compose up -d --scale maximo-ui=2
     ```
-10. Make sure to be accessible to Maximo login page: http://hostname/maximo
+10. Make sure to be accessible to ICD login page: http://hostname/maximo (hostname is a name/ip of the host that You're running Your docker)
 
 ## Skip the maxinst process in starting up the maxdb container by using Db2 restore command
 
