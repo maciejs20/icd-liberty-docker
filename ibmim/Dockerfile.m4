@@ -26,7 +26,7 @@ WORKDIR /tmp
 # Install required packages
 RUN apt-get update && apt-get install -y wget unzip && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /Install_Mgr && wget ${imagesurl}/$IM_IMAGE \
+RUN mkdir /Install_Mgr && wget -q ${imagesurl}/$IM_IMAGE \
  && unzip -q -d /Install_Mgr $IM_IMAGE \
  && rm $IM_IMAGE \
  && /Install_Mgr/installc -log /tmp/IM_Install_Unix.xml -acceptLicense \

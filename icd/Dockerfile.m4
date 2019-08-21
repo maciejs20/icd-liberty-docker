@@ -29,7 +29,7 @@ WORKDIR /tmp
 
 # Install required packages
 RUN apt-get update && apt-get install -y netcat wget inetutils-ping vim \
- dos2unix apache2 xmlstarlet && rm -rf /var/lib/apt/lists/*
+    dos2unix apache2 xmlstarlet && rm -rf /var/lib/apt/lists/*
 
 ## Install ICD middleware and installer
 RUN mkdir /Launchpad
@@ -43,37 +43,35 @@ RUN mkdir Launchpad
 
 ADD ICDSilentResponse.xml Launchpad
 
+RUN cd Launchpad && \
+    echo "*** Downloading ICD files: 1/2: $ICD_IMAGE_1" && wget -q ${imagesurl}/$ICD_IMAGE_1 && \
+    echo "*** Extracting file 1/2." && tar xpf $ICD_IMAGE_1 && \
+    echo "*** Downloading ICD files: 2/2: $ICD_IMAGE_2" && wget  -q ${imagesurl}/$ICD_IMAGE_2 && \
+    echo "*** Extracting file 2/2." && tar xpf $ICD_IMAGE_2 && \
+    cd .. \
+    #echo "--- ICD  repo" && ls -la  Launchpad/Install/ControlDeskRepo && \
+    #echo "--- SP   repo" && ls -la  Launchpad/Install/ServiceProviderRepo && \
+    #echo "--- TPAE repo" && ls -la  Launchpad/Install/TPAEInstallerRepository && \
+    #echo "--- MW   repo" && ls -la  Launchpad/Install/MWInstallerRepository && \
+    #echo "--- OPT  repo" && ls -la  Launchpad/Install/ControlDeskOptionalContentRepo && \
+    echo "*** Installing ICD." && /opt/IBM/InstallationManager/eclipse/tools/imcl \
+          -input Launchpad/ICDSilentResponse.xml    -acceptLicense -log /tmp/ICD_Install_Unix.xml && \
+    echo "*** Cleaning install dir" && \
+    rm Launchpad/$ICD_IMAGE_1 && rm Launchpad/$ICD_IMAGE_2 && rm -rf Launchpad && \
+    cd .. && rm -rf Launchpad && echo "*** Done, storing image"
 
-
-RUN cd Launchpad && echo "*** getting first file." && wget -q ${imagesurl}/$ICD_IMAGE_1 && \
-echo "*** extracting first file." && tar xvpf $ICD_IMAGE_1 && \
-echo "*** getting second file." && wget  -q ${imagesurl}/$ICD_IMAGE_2 && \
-echo "*** extracting second file." && tar xvpf $ICD_IMAGE_2 && \
-cd .. && echo "dir: " && \
-ls -la && ls -la Launchpad && ls -la Launchpad/Install && \
-echo "--- ICD  repo" && ls -la  Launchpad/Install/ControlDeskRepo && \
-echo "--- SP   repo" && ls -la  Launchpad/Install/ServiceProviderRepo && \
-echo "--- TPAE repo" && ls -la  Launchpad/Install/TPAEInstallerRepository && \
-echo "--- MW   repo" && ls -la  Launchpad/Install/MWInstallerRepository && \
-echo "--- OPT  repo" && ls -la  Launchpad/Install/ControlDeskOptionalContentRepo && \
-echo "*** Installing ICD." && /opt/IBM/InstallationManager/eclipse/tools/imcl \
- -input Launchpad/ICDSilentResponse.xml    -acceptLicense -log /tmp/ICD_Install_Unix.xml && \
- echo "*** clean install dir" && \
- rm Launchpad/$ICD_IMAGE_1 && rm Launchpad/$ICD_IMAGE_2 && rm -rf Launchpad && \
- cd .. && rm -rf Launchpad && echo "*** Done"
-
-# Install Maximo V7.6.1 feature pack
-#RUN mkdir /work
-#WORKDIR /work
-#ENV MAM_FP_IMAGE MAMMTFP761${fp}IMRepo.zip
-#RUN if [ "${installfp}" = "yes" ]; then wget -q ${imagesurl}/$MAM_FP_IMAGE && sleep 10 \
-# && /opt/IBM/InstallationManager/eclipse/tools/imcl install \
-# com.ibm.tivoli.tpae.base.tpae.main -repositories /work/$MAM_FP_IMAGE \
-# -installationDirectory /opt/IBM/SMP -log /tmp/TPAE_FP_Install_Unix.xml -acceptLicense \
-# && /opt/IBM/InstallationManager/eclipse/tools/imcl install \
-# com.ibm.tivoli.tpae.base.mam.main -repositories /work/$MAM_FP_IMAGE \
-# -installationDirectory /opt/IBM/SMP -log /tmp/MAM_FP_Install_Unix.xml -acceptLicense \
-# && rm /work/$MAM_FP_IMAGE; fi
+# Install ICD V7.6.1 feature pack
+RUN mkdir /work
+WORKDIR /work
+RUN if [ "${installfp}" = "yes" ]; then echo "*** Downloading ICD fixpacks: 1/2: $ICD_FP_IMAGE_1" \
+    && wget  ${imagesurl}/$ICD_FP_IMAGE_1 \
+    && echo "*** Downloading ICD fixpacks: 2/2: $ICD_FP_IMAGE_2" \
+    && wget  ${imagesurl}/$ICD_FP_IMAGE_2 && sleep 10 \
+    && ls -la \
+    && echo "*** Installing ICD fixpacks"  \
+    && /opt/IBM/InstallationManager/eclipse/tools/imcl install com.ibm.tivoli.tpae.base.icd.adv.main -repositories /work/$ICD_FP_IMAGE_1 \
+          -installationDirectory /opt/IBM/SMP -log /tmp/ICD_FP_Install_Unix.xml -acceptLicense \
+    && rm /work/$ICD_FP_IMAGE_1 && rm /work/$ICD_FP_IMAGE_2;  fi
 
 RUN dos2unix /opt/IBM/SMP/maximo/deployment/was-liberty-default/*.sh
 

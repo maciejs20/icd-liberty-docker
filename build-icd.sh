@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_DIR=images
+IMAGE_DIR=
 CHECK_DIR=
 JMS_OPT="no"
 PACKAGE_LIST=packages.list
-MAXIMO_VER="${MAXIMO_VER:-7.6.1.1}"
+ICD_VER="${ICD_VER:-7.6.1.1}"
 IM_VER="${IM_VER:-1.8.8}"
 WAS_VER="${WAS_VER:-19.0.0.6-webProfile8}"
 DB2_VER="${DB2_VER:-11.1.4a}"
@@ -49,9 +49,9 @@ function remove {
 
 # Usage: build "tag name" "version" "target directory name" "product name"
 function build {
-  echo "Start to build $4 image, opts: $*"
+  echo "Start to build $4 image, opts: [$*]"
   cd $3; make; cd ..
-  $DOCKER build $QUIET $5 --rm $EXTRA_BUILD_ARGS -t $NAME_SPACE/$1:$2 -t $NAME_SPACE/$1:latest --network $BUILD_NETWORK_NAME $3
+  $DOCKER build $QUIET $5 --rm $EXTRA_BUILD_ARGS -t $NAME_SPACE/$1:$2 -t $NAME_SPACE/$1:latest --network $BUILD_NETWORK_NAME $3 && echo "****  DOCKEROK *****"
 
   exists=`$DOCKER images -q --no-trunc $NAME_SPACE/$1:$2`
   if [[ -z "$exists" ]]; then
@@ -202,7 +202,7 @@ echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
-echo "Start a container - ${IMAGE_SERVER_NAME}"
+echo "Start a image hosting container - ${IMAGE_SERVER_NAME}"
 $DOCKER run --rm --name ${IMAGE_SERVER_NAME} -h ${IMAGE_SERVER_HOST_NAME} \
  --network ${BUILD_NETWORK_NAME} -v "${IMAGE_DIR}":/usr/share/nginx/html:ro -d nginx
 $DOCKER ps -f "name=^/${IMAGE_SERVER_NAME}"
@@ -221,7 +221,7 @@ echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Build IBM Control Desk image - icd"
-build "icd" "$MAXIMO_VER" "icd" "IBM Control Desk" "--build-arg enablejms=$JMS_OPT"
+build "icd" "$ICD_VER" "icd" "IBM Control Desk" "--build-arg enablejms=$JMS_OPT"
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
@@ -249,42 +249,42 @@ echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Build IBM WebSphere Liberty for Maximo UI image - maximo-ui"
-build "maximo-ui" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo UI" "--build-arg maximoapp=maximo-ui"
+build "maximo-ui" "$ICD_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo UI" "--build-arg maximoapp=maximo-ui"
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Build IBM WebSphere Liberty for Maximo Crontask image - maxapp"
-build "maximo-cron" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo Crontask" "--build-arg maximoapp=maximo-cron"
+build "maximo-cron" "$ICD_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo Crontask" "--build-arg maximoapp=maximo-cron"
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Build IBM WebSphere Liberty for Maximo API image - maxapp"
-build "maximo-api" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo API" "--build-arg maximoapp=maximo-api"
+build "maximo-api" "$ICD_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo API" "--build-arg maximoapp=maximo-api"
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Build IBM WebSphere Liberty for Maximo Report Server image - maximo-report"
-build "maximo-report" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo Report" "--build-arg maximoapp=maximo-report"
+build "maximo-report" "$ICD_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo Report" "--build-arg maximoapp=maximo-report"
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Build IBM WebSphere Liberty for Maximo MEA image - maximo-mea"
-build "maximo-mea" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo MEA" "--build-arg maximoapp=maximo-mea"
+build "maximo-mea" "$ICD_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo MEA" "--build-arg maximoapp=maximo-mea"
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Build IBM WebSphere Liberty for Maximo Report Server image - maximo-jmsconsumer"
-build "maximo-jmsconsumer" "$MAXIMO_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo JMS Consumer" "--build-arg maximoapp=maximo-jmsconsumer"
+build "maximo-jmsconsumer" "$ICD_VER" "maxapp" "IBM WebSphere Application Server Liberty for Maximo JMS Consumer" "--build-arg maximoapp=maximo-jmsconsumer"
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
