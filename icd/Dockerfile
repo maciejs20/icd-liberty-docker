@@ -44,6 +44,10 @@ ENV ICD_FP_IMAGE_2 icd_7.6.1.1_part2_linux64.zip
 #DB2 install image
 ENV DB2_IMAGE Middl_Inst_DB2_111_Linux_x86-64.tar.gz
 
+#Service Portal
+ENV ICDSP_IMAGE serviceportal_linux.bin
+ENV NODEJS_IMAGE node-v8.12.0-linux-x64.tar.xz.tar.xz
+
 
 ENV TEMP /tmp
 WORKDIR /tmp

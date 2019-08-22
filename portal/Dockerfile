@@ -10,9 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# IBMIM
+# Liberty
 #
-FROM ubuntu:16.04
+FROM centos:6.10
 
 LABEL maintainer="nishi2go@gmail.com"
 
@@ -42,20 +42,35 @@ ENV DB2_IMAGE Middl_Inst_DB2_111_Linux_x86-64.tar.gz
 ENV ICDSP_IMAGE serviceportal_linux.bin
 ENV NODEJS_IMAGE node-v8.12.0-linux-x64.tar.xz.tar.xz
 
-ARG updateim=no
-
-
-ENV TEMP /tmp
-WORKDIR /tmp
 
 # Install required packages
-RUN apt-get update && apt-get install -y wget unzip && rm -rf /var/lib/apt/lists/*
+USER root
+RUN yum -y -q install \
+    xz wget glibc.i686 libXtst.i686 libgcc.i686 gtk2.i686 \
+    gtk3.i686 adwaita-gtk2-theme.i686 PackageKit-gtk3-module.i686 \
+    libcanberra.i686 libcanberra-gtk2.i686
 
-RUN mkdir /Install_Mgr && wget -q ${imagesurl}/$IM_IMAGE \
- && unzip -q -d /Install_Mgr $IM_IMAGE \
- && rm $IM_IMAGE \
- && /Install_Mgr/installc -log /tmp/IM_Install_Unix.xml -acceptLicense \
- && rm -rf /Install_Mgr
+RUN  mkdir -p /opt/IBM/ServicePortal
 
-## Update Installation Manager
-RUN if [ "${updateim}" = "yes" ]; then /opt/IBM/InstallationManager/eclipse/tools/imcl install com.ibm.cic.agent; fi
+COPY installer.properties /opt/IBM/ServicePortal
+
+RUN  cd /opt/IBM \
+  && ls -la \
+  && wget  -q ${imagesurl}/$NODEJS_IMAGE \
+  && xz -d -c $NODEJS_IMAGE | tar -xvf - \
+  && rm $NODEJS_IMAGE  \
+  && ln -s node-v8.12.0-linux-x64/ node \
+  && ls -la
+
+RUN mkdir -p /opt/IBM/ServicePortal \
+  && cd /opt/IBM/ServicePortal \
+  && wget  -q ${imagesurl}/$ICDSP_IMAGE \
+  && chmod +x ./$ICDSP_IMAGE \
+  && ./$ICDSP_IMAGE -i silent -f /opt/IBM/ServicePortal/installer.properties \
+  && ls -la \
+  && rm -rf $ICDSP_IMAGE \
+  && ls -la
+
+
+WORKDIR /opt/IBM/ServicePortal
+ENTRYPOINT ["/opt/IBM/node/bin/node", "./app.js"]

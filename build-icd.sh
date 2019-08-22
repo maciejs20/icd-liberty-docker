@@ -21,6 +21,7 @@ IM_VER="${IM_VER:-1.8.8}"
 WAS_VER="${WAS_VER:-19.0.0.6-webProfile8}"
 DB2_VER="${DB2_VER:-11.1.4a}"
 PROXY_VER="${PROXY_VER:-1.8}"
+PORTAL_VER="${ICD_VER:-7.6.1.1}"
 
 DOCKER="${DOCKER_CMD:-docker}"
 
@@ -173,7 +174,7 @@ if [[ $REMOVE -eq 1 ]]; then
 fi
 
 echo "Start to build..."
-nrmax="16"
+nrmax="17"
 nr=1
 
 echo "------------------------------------------------------------"
@@ -208,6 +209,7 @@ $DOCKER run --rm --name ${IMAGE_SERVER_NAME} -h ${IMAGE_SERVER_HOST_NAME} \
 $DOCKER ps -f "name=^/${IMAGE_SERVER_NAME}"
 
 sleep 1
+
 
 echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
@@ -290,6 +292,13 @@ echo "------------------------------------------------------------"
 echo "            STEP $nr/$nrmax"
 echo "------------------------------------------------------------"
 let nr=$nr+1
+echo "Build IBM ICD Service Portal"
+build "portal" "$PORTAL_VER" "portal" "IBM ICD Service Portal"
+
+echo "------------------------------------------------------------"
+echo "            STEP $nr/$nrmax"
+echo "------------------------------------------------------------"
+let nr=$nr+1
 echo "Build Frontend Proxy Server - frontend-proxy"
 build "frontend-proxy" "$PROXY_VER" "frontend-proxy" "Frontend Proxy Server"
 
@@ -299,5 +308,6 @@ echo "------------------------------------------------------------"
 let nr=$nr+1
 echo "Stop the images container - ${IMAGE_SERVER_NAME}"
 $DOCKER stop ${IMAGE_SERVER_NAME}
+
 
 echo "Done"

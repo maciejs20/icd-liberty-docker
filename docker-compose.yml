@@ -172,6 +172,29 @@ services:
   #   volumes:
   #     - maximo:/maximo
 
+  portal:
+    image: icd-liberty/jmsserver
+    environment:
+      - LICENSE=accept
+      - "JMS_SERVER_HOST=${ENV_JMS_SERVER_HOST}"
+      - "JMS_SERVER_PORT=${ENV_JMS_SERVER_PORT}"
+      - "JMS_SERVER_SSL_PORT=${ENV_JMS_SERVER_SSL_PORT}"
+    hostname: "${ENV_JMS_SERVER_HOST}"
+    ports:
+      - "${ENV_JMS_SERVER_PORT}:${ENV_JMS_SERVER_PORT}"
+      - "${ENV_JMS_SERVER_SSL_PORT}:${ENV_JMS_SERVER_SSL_PORT}"
+    networks:
+      - frontend
+
+  frontend-proxy:
+    image: icd-liberty/frontend-proxy
+    ports:
+      - 80:80
+    depends_on:
+      - maximo-ui
+    networks:
+      - frontend
+
   jmsserver:
     image: icd-liberty/jmsserver
     environment:
@@ -192,6 +215,17 @@ services:
       - 80:80
     depends_on:
       - maximo-ui
+    networks:
+      - frontend
+
+  portal:
+    image: icd-liberty/portal
+    environment:
+      - LICENSE=accept
+      - "PORTAL_SERVER_HOST=${ENV_PORTAL_SERVER_HOST}"
+    hostname: "${ENV_PORTAL_SERVER_HOST}"
+    ports:
+      - "${ENV_PORTAL_SERVER_PORT}:${ENV_PORTAL_SERVER_PORT}"
     networks:
       - frontend
 
