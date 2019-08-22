@@ -71,6 +71,8 @@ RUN mkdir -p /opt/IBM/ServicePortal \
   && rm -rf $ICDSP_IMAGE \
   && ls -la
 
+ENV PORTAL_SERVER_HOST portal
+ENV PORTAL_SERVER_PORT 3000
 
 WORKDIR /opt/IBM/ServicePortal
 ENTRYPOINT ["/opt/IBM/node/bin/node", "./app.js"]

@@ -225,7 +225,7 @@ services:
       - "PORTAL_SERVER_HOST=${ENV_PORTAL_SERVER_HOST}"
     hostname: "${ENV_PORTAL_SERVER_HOST}"
     ports:
-      - "${ENV_PORTAL_SERVER_PORT}:${ENV_PORTAL_SERVER_PORT}"
+    - "${ENV_PORTAL_SERVER_PORT}:${ENV_PORTAL_SERVER_PORT}"
     networks:
       - frontend
 
