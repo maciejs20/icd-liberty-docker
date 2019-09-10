@@ -18,4 +18,12 @@ include(../docker_header.m4)
 
 include(../docker_images.m4)
 
+RUN apt-get update && apt-get install -y  \
+		iputils-ping procps telnet
+
 COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+COPY docker-entrypoint.sh /
+WORKDIR /
+RUN chmod +x ./docker-entrypoint.sh
+
+#ENTRYPOINT ["sleep","1d"]

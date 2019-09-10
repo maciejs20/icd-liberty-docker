@@ -43,4 +43,12 @@ ENV ICDSP_IMAGE serviceportal_linux.bin
 ENV NODEJS_IMAGE node-v8.12.0-linux-x64.tar.xz.tar.xz
 
 
+RUN apt-get update && apt-get install -y  \
+		iputils-ping procps telnet
+
 COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+COPY docker-entrypoint.sh /
+WORKDIR /
+RUN chmod +x ./docker-entrypoint.sh
+
+#ENTRYPOINT ["sleep","1d"]

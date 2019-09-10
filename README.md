@@ -1,19 +1,25 @@
 # Building and deploying an IBM Control Desk V7.6.1 with Liberty image to Docker
 
 **This is an experimental version. It does not work properly.**
+**At this time we can't fully run ICD on Liberty!**
+
 
 ### Current state
 
-At this stage does start, but some pages are rendered incorrectly ***
+At this stage does start, but pages that are related to ICD are rendered incorrectly. All maximo-originated pages are OK, but all ICD-specific shows rendering errors. This is due to lack of support for ICD on Liberty, as officialy stated by IBM's support. We need to wait until it arrives, or put more effort to extend the WAR file creation. Official Liberty support is expected in late 2019/early 2020.
+ICD's Service Portal also starts succesfully, but than it does not allow to login into the system. This should be diagnosed further.
+The main ICD module is available at port 80, but Service Portal has been moved to port 88.
+
+There are many unnecessary steps/packages in the image creation process - this is done intentionally to provide some debug tools for whole process. They will be cleared in the future.
 
 
 ### Goals
 This project is heavily based on nishi2go/maximo-liberty-docker - altered for IBM Control Desk to work. All credits goes to nishi2go, he did 90% of the work required for ICD to start.
-My fork does not support building of pure Maximo, only ICD installation is to be supported.
+My fork does not support building of pure Maximo, only ICD installation is to be supported. I don't support building on Windows either.
 
 ICD with Liberty on Docker enables to run Control Desk with WebSphere Liberty on Docker. The images are deployed fine-grained services instead of single instance. The following instructions describe how to set up IBM Control Desk V7.6.1 Docker images. This images consist of several components e.g. WebSphere Liberty, Db2, and ICD installation program.
 
-Before you start, please check the official guide in technotes first. [Maximo Asset Management 7.6.1 WebSphere Liberty Support](https://www-01.ibm.com/support/docview.wss?uid=swg22017219)
+Before you start, please check the official guide in technotes first (it is only for Maximo and is not sufficient for ICD to run). [Maximo Asset Management 7.6.1 WebSphere Liberty Support](https://www-01.ibm.com/support/docview.wss?uid=swg22017219)
 
 ![Componets of Docker Images](https://raw.githubusercontent.com/nishi2go/maximo-liberty-docker/master/maximo-liberty-docker.svg?sanitize=true)
 
@@ -67,32 +73,27 @@ Procedures:
     ```bash
     git clone https://github.com/maciejs20/icd-liberty-docker
     ```
-2. Move to the directory
+2. Go to the directory
     ```bash
-    cd maximo-liberty-docker
+    cd icd-liberty-docker
     ```
-3. Place the downloaded ICD, IBM Db2, IBM Installation Manager and IBM WebSphere Liberty License binaries to a images directory
+3. Place the downloaded ICD, IBM Db2, IBM Installation Manager and IBM WebSphere Liberty License binaries to a "images" directory directly
 4. Run build tool
    ```bash
-   bash build.sh-icd [-c] [-C] [-r] [Image directory]
+   bash build-icd.sh [-v] [home of image directory]
    ```
 
    Example:
    ```bash
-   bash build.sh -c -r /images
+   build-icd.sh -v $(pwd)
    ```
 
-   Example for Docker for Windows:
-   ```bash
-   bash build.sh -c -r -d /images "C:/images"
-   ```
-   Note 1: This script works on Windows Subsystem on Linux.<br>
-   Note 2: md5sum is required. For Mac, install it manually - https://raamdev.com/2008/howto-install-md5sum-sha1sum-on-mac-os-x/
 7. Edit docker-compose.yml to enable optional servers e.g. maximo-api, maximo-report and etc.
 
 8. Test Your build with
     ```bash
     docker-compose up --abort-on-container-exit
+    ```
 
 9. Run containers by using the Docker Compose file to create and deploy instances:
     ```bash
@@ -105,6 +106,8 @@ Procedures:
     docker-compose up -d --scale maximo-ui=2
     ```
 10. Make sure to be accessible to ICD login page: http://hostname/maximo (hostname is a name/ip of the host that You're running Your docker)
+10. Make sure to be accessible to ICD SP login page: http://hostname:88/portal (hostname is a name/ip of the host that You're running Your docker)
+
 
 ## Skip the maxinst process in starting up the maxdb container by using Db2 restore command
 
@@ -114,7 +117,7 @@ Procedures:
 1. Build container images first (follow above instructions)
 2. Move to the cloned directory.
     ```bash
-    cd maximo-liberty-docker
+    cd icd-liberty-docker
     ```
 3. Make a backup directory.
     ```bash
@@ -138,5 +141,7 @@ Procedures:
 So that, now you can create the containers from the backup image that is stored in the directory.
 
 ## To do
-1. Kubernetes
-2. Password with Docker secrets
+1. HTTPS for maximo and service Portal
+2. Refine the volumes for MAXDB - improve startup time
+3. Wait for IBM to provide support for Liberty with ICD
+4. Port installation for Kubernetes

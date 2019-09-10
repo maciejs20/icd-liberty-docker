@@ -49,5 +49,10 @@ RUN mkdir -p /opt/IBM/ServicePortal \
 ENV PORTAL_SERVER_HOST portal
 ENV PORTAL_SERVER_PORT 3000
 
+COPY config.js /opt/IBM/ServicePortal/
+
+RUN yum -y -q install \
+    iputils vim telnet lynx
+
 WORKDIR /opt/IBM/ServicePortal
 ENTRYPOINT ["/opt/IBM/node/bin/node", "./app.js"]

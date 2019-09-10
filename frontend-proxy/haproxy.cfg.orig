@@ -1,3 +1,15 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 global
   maxconn 1024
 
@@ -8,8 +20,6 @@ defaults
   timeout client 120s
   timeout server 120s
   default-server init-addr none
-  option httplog
-  log stdout  local0  info
 
 resolvers dockerdns
   nameserver dns 127.0.0.11:53
@@ -43,28 +53,21 @@ backend maximo-mea
   http-request set-header X-Client-IP req.hdr_ip([X-Forwarded-For])
   server s4 maximo-mea:9084 check inter 10s resolvers dockerdns resolve-prefer ipv4
 
-backend sportal
-  cookie JSESSIONIDPORTAL prefix nocache
-#  http-request set-uri %[url,regsub(^/portal,/,)] if { path_beg /portal }
-#  redirect scheme https if !{ ssl_fc }
+backend portal
   http-request set-header X-Client-IP req.hdr_ip([X-Forwarded-For])
-  http-request set-query %[query,regsub(JSESSIONIDPORTAL=s5~,JSESSIONIDPORTAL=)]
-  server s5 sportal:3000 check-ssl ssl verify none cookie s5 inter 10s resolvers dockerdns resolve-prefer ipv4
-
-frontend http2-in
-  bind *:88
-  use_backend sportal if { path -i -m beg /portal/ }
-  default_backend sportal
-
+  http-request set-query %[query,regsub(JSESSIONIDPORTAL=s0~,JSESSIONIDPORTAL=)]
+  server s5 portal:3000 check inter 10s resolvers dockerdns resolve-prefer ipv4
 
 frontend http-in
   bind *:80
   use_backend maximo-report if { req.cook(JSESSIONIDREPORT) -m found }
   use_backend maximo-api if { req.cook(JSESSIONIDAPI) -m found }
   use_backend maximo-ui if { req.cook(JSESSIONIDUI) -m found }
+  use_backend portal if { req.cook(JSESSIONIDPORTAL) -m found }
   use_backend maximo-report if { path -i -m beg /maximoreport }
   use_backend maximo-api if { path -i -m beg /maximoapi }
   use_backend maximo-mea if { path -i -m beg /meaweb }
   use_backend maximo-jmsconsumer if { path -i -m beg /mbo }
   use_backend maximo-ui if { path -i -m beg /maximo/ }
+  use_backend portal if { path -i -m beg /portal }
   default_backend maximo-ui
